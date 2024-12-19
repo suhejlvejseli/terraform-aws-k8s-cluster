@@ -10,7 +10,7 @@ locals {
 
   github_repos = [
     {
-      name = "suhejl.vejseli/terraform-aws-k8s-cluster"
+      name = "suhejlvejseli/terraform-aws-k8s-cluster"
       policy = {
         Version = "2012-10-17",
         Statement = [
