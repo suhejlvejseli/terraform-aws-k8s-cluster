@@ -52,7 +52,7 @@ locals {
 
 resource "aws_iam_openid_connect_provider" "github" {
   client_id_list  = [local.github_url, "sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.tfc_certificate[0].sha1_fingerprint]
+  thumbprint_list = [data.tls_certificate.tfc_certificate.certificates[0].sha1_fingerprint]
   url             = "https://token.actions.githubusercontent.com"
 
   tags = local.default_tags
