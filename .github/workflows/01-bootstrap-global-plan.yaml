@@ -1,0 +1,64 @@
+name: "01-bootstrap-global-plan"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "01-bootstrap/**"
+      - ".github/workflows/01-bootstrap-global-plan.yaml"
+
+env:
+  TERRAFORM_VERSION: "1.5.7"
+  WORKING_DIR: "01-bootstrap"
+
+defaults:
+  run:
+    working-directory: "01-bootstrap"
+  
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+    if: github.event.review.state != 'approved'
+    steps:
+      - name: code-checkout
+        uses: actions/checkout@v3
+
+      - name: configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "eu-central-1"
+
+      - name: terraform-setup
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+          terraform_wrapper: false
+
+      - name: terraform-init
+        id: init
+        shell: bash
+        run: |
+         terraform init
+
+      - name: terraform-fmt
+        id: fmt
+        run: terraform fmt -check
+
+      - name: terraform-validate
+        id: validate
+        run: |
+          terraform validate
+          echo "::set-output name=stdout::$(terraform validate -no-color)"
+
+      - name: terraform-plan
+        id: plan
+        run: |
+          terraform plan -out=plan.tmp
+          terraform show -no-color plan.tmp > ${GITHUB_WORKSPACE}/plan.txt
