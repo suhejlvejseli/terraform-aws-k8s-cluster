@@ -51,10 +51,10 @@ locals {
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
-  client_id_list = [local.github_url, "sts.amazonaws.com"]
+  client_id_list  = [local.github_url, "sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.tfc_certificate[0].sha1_fingerprint]
-  url = "https://token.actions.githubusercontent.com"
-  
+  url             = "https://token.actions.githubusercontent.com"
+
   tags = local.default_tags
 }
 
@@ -78,7 +78,7 @@ resource "aws_iam_policy" "this" {
 }
 
 resource "aws_iam_policy_attachment" "this" {
-  for_each = { for t in local.github_repos: t.name => t }
+  for_each = { for t in local.github_repos : t.name => t }
 
   name       = "github-${each.value.name}-attachment"
   roles      = [aws_iam_role.this[each.key].name]
