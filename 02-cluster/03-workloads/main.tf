@@ -22,6 +22,8 @@ resource "aws_iam_role" "master_node_role" {
       }
     ]
   })
+
+  depends_on = [ aws_s3_bucket.cluster_bucket ]
 }
 
 resource "aws_iam_policy" "master_node_policy" {
@@ -40,16 +42,22 @@ resource "aws_iam_policy" "master_node_policy" {
       }
     ]
   })
+
+  depends_on = [ aws_iam_role.master_node_role ]
 }
 
 resource "aws_iam_role_policy_attachment" "master_node_attachment" {
   role       = aws_iam_role.master_node_role.name
   policy_arn = aws_iam_policy.master_node_policy.arn
+
+  depends_on = [ aws_iam_policy.master_node_policy ]
 }
 
 resource "aws_iam_instance_profile" "master_node_profile" {
   name = "master-node-profile"
   role = aws_iam_role.master_node_role.name
+
+  depends_on = [ aws_iam_role_policy_attachment.master_node_attachment ]
 }
 
 resource "aws_iam_role" "worker_node_role" {
@@ -67,6 +75,8 @@ resource "aws_iam_role" "worker_node_role" {
       }
     ]
   })
+
+  depends_on = [ aws_s3_bucket.cluster_bucket ]
 }
 
 resource "aws_iam_policy" "worker_node_policy" {
@@ -84,16 +94,22 @@ resource "aws_iam_policy" "worker_node_policy" {
       }
     ]
   })
+
+  depends_on = [ aws_iam_role.worker_node_role ]
 }
 
 resource "aws_iam_role_policy_attachment" "worker_node_attachment" {
   role       = aws_iam_role.worker_node_role.name
   policy_arn = aws_iam_policy.worker_node_policy.arn
+
+  depends_on = [ aws_iam_policy.worker_node_policy ]
 }
 
 resource "aws_iam_instance_profile" "worker_node_profile" {
   name = "worker-node-profile"
   role = aws_iam_role.worker_node_role.name
+
+  depends_on = [ aws_iam_role_policy_attachment.worker_node_attachment ]
 }
 
 resource "aws_instance" "master" {
