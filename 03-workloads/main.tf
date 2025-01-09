@@ -99,6 +99,7 @@ resource "aws_iam_instance_profile" "worker_node_profile" {
 resource "aws_instance" "master" {
   ami = var.ami_id
   subnet_id = data.terraform_remote_state.networking.outputs.subnet_ids[0]
+  
   instance_type = var.instance_type
   key_name = var.key_pair_name
   associate_public_ip_address = true
