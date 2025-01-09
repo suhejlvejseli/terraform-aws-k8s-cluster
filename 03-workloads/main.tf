@@ -98,11 +98,11 @@ resource "aws_iam_instance_profile" "worker_node_profile" {
 
 resource "aws_instance" "master" {
   ami = var.ami_id
-  subnet_id = data.terraform_remote_state.networking.outputs.subnet_ids
+  subnet_id = data.terraform_remote_state.networking.outputs.subnet_ids[0]
   instance_type = var.instance_type
   key_name = var.key_pair_name
   associate_public_ip_address = true
-  security_groups = [ data.terraform_remote_state.networking.outputs.cluster_sg ]
+  security_groups = [ data.terraform_remote_state.networking.outputs.security_group_id ]
 
   iam_instance_profile = aws_iam_instance_profile.master_node_profile.name
 
