@@ -18,7 +18,7 @@ locals {
             Action = [
               "vpc:*",
               "ec2:*",
-              "iam:*",
+              "iam:*"
             ]
             Effect   = "Allow"
             Resource = "*"
