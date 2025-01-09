@@ -1,0 +1,18 @@
+name: 03-workloads-destroy-infrastructure
+
+on: 
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy-infrastructure:
+    uses: suhejlvejseli/terraform-workflows/.github/workflows/terraform-destroy-template.yaml@main
+    with:
+      terraform_version: "1.5.7"
+      working_directory: './03-workloads'
+      aws_iam_role_arn: 'arn:aws:iam::116981781406:role/github-terraform-aws-k8s-cluster-role'
+      aws_iam_role_session_name: "github-terraform-aws-k8s-cluster-role"
+      aws_region: "eu-central-1"
