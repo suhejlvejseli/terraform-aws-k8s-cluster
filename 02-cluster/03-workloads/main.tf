@@ -171,6 +171,6 @@ resource "aws_instance" "worker" {
   ]
 
   tags = merge({
-    Name = "k8s-worker-node-${count.index + 1}}"
+    Name = "k8s-worker-node-${count.index + 1}"
   }, local.default_tags)
 }

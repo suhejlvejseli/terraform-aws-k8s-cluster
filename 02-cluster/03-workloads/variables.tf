@@ -5,7 +5,7 @@ variable "instance_type" {
 
 variable "ami_id" {
   description = "EC2 AMI image to use"
-  default = "ami-0a6b2839d44d781b2"
+  default = "ami-0a628e1e89aaedf80"
 }
 
 variable "key_pair_name" {
