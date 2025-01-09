@@ -1,12 +1,12 @@
-name: 03-workloads-plan
+name: 02-cluster-workloads-plan
 
 on: 
   pull_request:
     branches:
       - main
     paths:
-      - "03-workloads/**"
-      - ".github/workflows/03-workloads-plan.yaml"
+      - "02-cluster/03-workloads/**"
+      - ".github/workflows/02-cluster-workloads-plan.yaml"
 
 permissions:
   id-token: write
@@ -17,7 +17,7 @@ jobs:
     uses: suhejlvejseli/terraform-workflows/.github/workflows/terraform-plan-template.yaml@main
     with:
       terraform_version: "1.5.7"
-      working_directory: './03-workloads'
+      working_directory: './02-cluster/03-workloads'
       aws_iam_role_arn: 'arn:aws:iam::116981781406:role/github-terraform-aws-k8s-cluster-role'
       aws_iam_role_session_name: "github-terraform-aws-k8s-cluster-role"
       aws_region: "eu-central-1"
