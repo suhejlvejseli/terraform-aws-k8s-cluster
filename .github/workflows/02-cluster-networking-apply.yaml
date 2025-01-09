@@ -1,0 +1,23 @@
+name: 02-cluster-networking-apply
+
+on: 
+  push:
+    branches:
+      - main
+    paths:
+      - "02-cluster/02-networking/**"
+      - ".github/workflows/02-cluster-networking-apply.yaml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-apply:
+    uses: suhejlvejseli/terraform-workflows/.github/workflows/terraform-apply-template.yaml@main
+    with:
+      terraform_version: "1.5.7"
+      working_directory: './02-cluster/02-networking'
+      aws_iam_role_arn: 'arn:aws:iam::116981781406:role/github-terraform-aws-k8s-cluster-role'
+      aws_iam_role_session_name: "github-terraform-aws-k8s-cluster-role"
+      aws_region: "eu-central-1"
