@@ -18,7 +18,7 @@ locals {
             Action = [
               "vpc:*",
               "ec2:*",
-              "iam:*"
+              "iam:*",
             ]
             Effect   = "Allow"
             Resource = "*"
@@ -28,7 +28,11 @@ locals {
               "s3:PutObject",
               "s3:Describe*",
               "s3:Get*",
-              "s3:List*"
+              "s3:List*",
+              "s3:CreateBucket",
+              "s3:PutBucketOwnershipControls",
+              "s3:PutBucketAcl",
+              "s3:DeleteBucket"
             ]
             Effect   = "Allow"
             Resource = "*"
