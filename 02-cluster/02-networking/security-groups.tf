@@ -1,5 +1,5 @@
 resource "aws_security_group" "cluster_sg" {
-  name        = "private_instances-sg"
+  name        = "cluster-sg"
   description = "Security Group for private_instances"
   vpc_id      = aws_vpc.main.id
 
