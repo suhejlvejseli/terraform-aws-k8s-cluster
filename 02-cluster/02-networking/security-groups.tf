@@ -1,4 +1,4 @@
-resource "aws_security_group" "private_instances" {
+resource "aws_security_group" "cluster_sg" {
   name        = "private_instances-sg"
   description = "Security Group for private_instances"
   vpc_id      = aws_vpc.main.id
@@ -52,6 +52,6 @@ resource "aws_security_group" "private_instances" {
   }
 
   tags = merge({
-    Name = "private-instances-sg"
+    Name = "K8S-cluster-sg"
   }, local.default_tags)
 }
