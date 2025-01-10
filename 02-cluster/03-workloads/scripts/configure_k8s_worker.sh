@@ -5,14 +5,22 @@
 hostname k8s-worker-node-${worker_number}
 echo "k8s-worker-node-${worker_number}" > /etc/hostname
 
+sudo su
 
-apt update
-apt install apt-transport-https ca-certificates curl software-properties-common -y
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+apt-get install unzip
+unzip awscliv2.zip
+sudo ./aws/install
 
-#Installing Docker
-tee /etc/modules-load.d/containerd.conf <<EOF
+sudo swapoff -a
+sed -i '/ swap / s/^/#/' /etc/fstab
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.ipv4.ip_forward = 1
+EOF
+
+sysctl --system
+
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 overlay
 br_netfilter
 EOF
@@ -20,55 +28,56 @@ EOF
 modprobe overlay
 modprobe br_netfilter
 
+apt-get update
+apt-get -y install ca-certificates curl
+install -m 0755 -d /etc/apt/keyrings
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-apt update
-apt-cache policy docker-ce
-apt install docker-ce -y
-apt install awscli -y
+# Install containerd
+sudo apt-get update
+sudo apt-get -y install containerd.io
+sudo mkdir -p /etc/containerd
+sudo containerd config default | sudo tee /etc/containerd/config.toml
+sudo sed -i "s/SystemdCgroup = false/SystemdCgroup = true/g" "/etc/containerd/config.toml"
+sudo systemctl restart containerd
+sudo systemctl status containerd
 
-#Be sure to understand, if you follow official Kubernetes documentation, in Ubuntu 20 it does not work, that is why, I did modification to script
-#Adding Kubernetes repositories
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo gpg -dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
-#Next 2 lines are different from official Kubernetes guide, but the way Kubernetes describe step does not work
-# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
-# echo "deb https://packages.cloud.google.com/apt kubernetes-xenial main" > /etc/apt/sources.list.d/kurbenetes.list
-
-mkdir -p /etc/apt/keyrings/
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-
-#Turn off swap
-swapoff -a
-sudo sed -i '/swap/d' /etc/fstab
-mount -a
-ufw disable
-
-#Installing Kubernetes tools
-apt update
-# apt install kubelet kubeadm kubectl -y
-apt install -y kubeadm=1.28.1-1.1 kubelet=1.28.1-1.1 kubectl=1.28.1-1.1
-
+# Install Kubernetes tools
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
 
 #next line is getting EC2 instance IP, for kubeadm to initiate cluster
 #we need to get EC2 internal IP address- default ENI is eth0
 export ipaddr=`ip address|grep eth0|grep inet|awk -F ' ' '{print $2}' |awk -F '/' '{print $1}'`
 
 
-# the kubeadm init won't work entel remove the containerd config and restart it.
-rm /etc/containerd/config.toml
-systemctl restart containerd
+# # the kubeadm init won't work entel remove the containerd config and restart it.
+# rm /etc/containerd/config.toml
+# systemctl restart containerd
 
-tee /etc/sysctl.d/kubernetes.conf<<EOF
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-EOF
+# tee /etc/sysctl.d/kubernetes.conf<<EOF
+# net.bridge.bridge-nf-call-ip6tables = 1
+# net.bridge.bridge-nf-call-iptables = 1
+# net.ipv4.ip_forward = 1
+# EOF
 
-sysctl --system
+# sysctl --system
 
 # to insure the join command start when the installion of master node is done.
-sleep 1m
+sleep 60
 
 aws s3 cp s3://${s3_bucket_name}/join_command.sh /tmp/.
 chmod +x /tmp/join_command.sh
