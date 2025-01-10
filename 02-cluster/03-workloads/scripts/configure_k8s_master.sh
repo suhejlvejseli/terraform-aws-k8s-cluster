@@ -67,17 +67,24 @@ export pubip=`dig +short myip.opendns.com @resolver1.opendns.com`
 # Initialize the Kubernetes cluster 
 kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans=$pubip > /tmp/restult.out
 
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-export KUBECONFIG=/etc/kubernetes/admin.conf
-
 cat /tmp/restult.out
 
 #to get join commdn
 tail -2 /tmp/restult.out > /tmp/join_command.sh;
 aws s3 cp /tmp/join_command.sh s3://${s3_bucket_name};
+
 #this adds .kube/config for root account, run same for ubuntu user, if you need it
+mkdir -p /root/.kube;
+cp -i /etc/kubernetes/admin.conf /root/.kube/config;
+cp -i /etc/kubernetes/admin.conf /tmp/admin.conf;
+chmod 755 /tmp/admin.conf
+
+#Add kube config to ubuntu user.
+mkdir -p /home/ubuntu/.kube;
+cp -i /etc/kubernetes/admin.conf /home/ubuntu/.kube/config;
+chmod 755 /home/ubuntu/.kube/config
+
+export KUBECONFIG=/root/.kube/config
 #############################################################
 # mkdir -p /root/.kube;
 # cp -i /etc/kubernetes/admin.conf /root/.kube/config;
