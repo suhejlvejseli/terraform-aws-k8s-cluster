@@ -32,7 +32,8 @@ locals {
               "s3:CreateBucket",
               "s3:PutBucketOwnershipControls",
               "s3:PutBucketAcl",
-              "s3:DeleteBucket"
+              "s3:DeleteBucket",
+              "s3:DeleteObjectVersion"
             ]
             Effect   = "Allow"
             Resource = "*"
