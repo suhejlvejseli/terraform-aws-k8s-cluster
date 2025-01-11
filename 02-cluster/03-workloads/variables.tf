@@ -1,6 +1,11 @@
-variable "instance_type" {
+variable "master_instance_type" {
   description = "AWS EC2 instance type"
   default = "t2.medium"
+}
+
+variable "worker_instance_type" {
+  description = "AWS EC2 instance type"
+  default = "t2.micro"
 }
 
 variable "ami_id" {
