@@ -107,7 +107,10 @@ bash get_helm.sh
 
 # Setup calico
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yamlkubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+
+kubectl create -f custom-resources.yaml
 
 
 
