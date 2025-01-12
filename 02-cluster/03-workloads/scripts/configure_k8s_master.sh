@@ -106,12 +106,18 @@ chmod 700 get_helm.sh
 bash get_helm.sh
 
 # Setup calico
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yamlkubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+# kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
 
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
+# curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml -O
 
-kubectl create -f custom-resources.yaml
+# kubectl create -f custom-resources.yaml
 
+# Setup flannel as CNI
+curl -O https://raw.githubusercontent.com/flannel-io/flannel/v0.22.0/Documentation/kube-flannel.yml
+
+sed -i "s|\"Network\": \"10.244.0.0/16\"|\"Network\": \"192.168.0.0/16\"|" "kube-flannel.yml"
+
+kubectl apply -f kube-flannel.yml
 
 
 #Uncomment next line if you want calico Cluster Pod Network
