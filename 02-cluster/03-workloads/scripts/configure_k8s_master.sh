@@ -86,8 +86,10 @@ chmod 755 /home/ubuntu/.kube/config
 
 export KUBECONFIG=/root/.kube/config
 
-#to copy kube config file to s3
-aws s3 cp /etc/kubernetes/admin.conf s3://${s3_bucket_name}
+#to copy kube config file to s3 
+cp /etc/kubernetes/admin.conf /home/ubuntu/
+sed -i "s/https:\/\/$ipaddr:6443/https:\/\/$pubip:6443/" /home/ubuntu/admin.conf
+aws s3 cp /home/ubuntu/admin.conf s3://${s3_bucket_name}
 
 # install helm
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
