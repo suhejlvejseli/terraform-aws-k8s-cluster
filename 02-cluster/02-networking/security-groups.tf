@@ -41,7 +41,7 @@ resource "aws_security_group" "cluster_sg" {
     from_port   = 30000
     to_port     = 32767
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
     # DNS traffic for CoreDNS
@@ -57,6 +57,13 @@ resource "aws_security_group" "cluster_sg" {
     to_port     = 53
     protocol    = "tcp"
     cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [ aws_vpc.main.cidr_block ]
   }
 
     # ICMP (Ping) - Inbound and Outbound
