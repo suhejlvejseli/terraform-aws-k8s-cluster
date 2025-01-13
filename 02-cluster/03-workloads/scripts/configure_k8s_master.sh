@@ -61,7 +61,7 @@ sudo systemctl enable --now kubelet
 
 #next line is getting EC2 instance IP, for kubeadm to initiate cluster
 #we need to get EC2 internal IP address- default ENI is eth0
-export ipaddr=`ip address|grep eth0|grep inet|awk -F ' ' '{print $2}' |awk -F '/' '{print $1}'`
+export ipaddr=`ip address|grep enX0|grep inet|awk -F ' ' '{print $2}' |awk -F '/' '{print $1}'`
 export pubip=`dig +short myip.opendns.com @resolver1.opendns.com`
 
 # Initialize the Kubernetes cluster 
