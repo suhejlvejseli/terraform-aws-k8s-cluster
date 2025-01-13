@@ -95,8 +95,14 @@ chmod 700 get_helm.sh
 bash get_helm.sh
 
 # Setup flannel as CNI
-curl -O https://raw.githubusercontent.com/flannel-io/flannel/v0.22.0/Documentation/kube-flannel.yml
+# curl -O https://raw.githubusercontent.com/flannel-io/flannel/v0.22.0/Documentation/kube-flannel.yml
 
-sed -i "s|\"Network\": \"10.244.0.0/16\"|\"Network\": \"192.168.0.0/16\"|" "kube-flannel.yml"
+# sed -i "s|\"Network\": \"10.244.0.0/16\"|\"Network\": \"192.168.0.0/16\"|" "kube-flannel.yml"
 
-kubectl apply -f kube-flannel.yml
+# kubectl apply -f kube-flannel.yml
+
+# Setup flannel
+kubectl create --kubeconfig /root/.kube/config ns kube-flannel
+kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+helm repo add flannel https://flannel-io.github.io/flannel/
+helm install flannel --set podCidr="192.168.0.0/16" --namespace kube-flannel flannel/flannel
