@@ -102,7 +102,13 @@ bash get_helm.sh
 # kubectl apply -f kube-flannel.yml
 
 # Setup flannel
-kubectl create --kubeconfig /root/.kube/config ns kube-flannel
-kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
-helm repo add flannel https://flannel-io.github.io/flannel/
-helm install flannel --set podCidr="192.168.0.0/16" --namespace kube-flannel flannel/flannel
+# kubectl create --kubeconfig /root/.kube/config ns kube-flannel
+# kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
+# helm repo add flannel https://flannel-io.github.io/flannel/
+# helm install flannel --set podCidr="192.168.0.0/16" --namespace kube-flannel flannel/flannel
+
+#Uncomment next line if you want calico Cluster Pod Network
+curl -o /root/calico.yaml https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/tigera-operator.yaml
+sleep 5
+kubectl --kubeconfig /root/.kube/config apply -f /root/calico.yaml
+systemctl restart kubelet
