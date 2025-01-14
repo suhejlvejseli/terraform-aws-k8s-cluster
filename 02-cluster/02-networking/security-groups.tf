@@ -88,6 +88,7 @@ resource "aws_security_group" "cluster_sg" {
     protocol = "-1"
     cidr_blocks = [ aws_vpc.main.cidr_block ]
   }
+  
 
     # ICMP (Ping) - Inbound and Outbound
   ingress {
