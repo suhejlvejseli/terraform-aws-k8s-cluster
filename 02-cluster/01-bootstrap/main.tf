@@ -51,6 +51,23 @@ locals {
           }
         ]
       }
+    },
+    {
+      name = "suhejlvejseli/k8s-tools"
+      policy = {
+        Version = "2012-10-17",
+        Statement = [
+          {
+            Action = [
+              "vpc:*",
+              "ec2:*",
+              "s3:*"
+            ]
+            Effect   = "Allow"
+            Resource = "*"
+          }
+        ]
+      }
     }
   ]
 }
