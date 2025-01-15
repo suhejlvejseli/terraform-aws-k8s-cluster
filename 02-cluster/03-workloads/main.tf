@@ -39,6 +39,15 @@ resource "aws_iam_policy" "master_node_policy" {
           "s3:GetObject"
         ],
         Resource = "arn:aws:s3:::k8s-bucket-workloads/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:*",
+          "ec2:*",
+          "elasticloadbalancing:*"
+        ],
+        Resource = "*"
       }
     ]
   })
@@ -91,6 +100,14 @@ resource "aws_iam_policy" "worker_node_policy" {
           "s3:GetObject"
         ],
         Resource = "arn:aws:s3:::k8s-bucket-workloads/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:*",
+          "ecr:*"
+        ],
+        Resource = "*"
       }
     ]
   })
