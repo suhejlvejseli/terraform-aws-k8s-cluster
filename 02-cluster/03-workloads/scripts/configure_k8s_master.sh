@@ -65,7 +65,7 @@ export ipaddr=`ip address|grep enX0|grep inet|awk -F ' ' '{print $2}' |awk -F '/
 export pubip=`dig +short myip.opendns.com @resolver1.opendns.com`
 
 # Initialize the Kubernetes cluster 
-kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=192.168.0.0/16 --apiserver-cert-extra-sans=$pubip > /tmp/restult.out
+kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=192.168.0.0/16 --cloud-provider=aws --apiserver-cert-extra-sans=$pubip > /tmp/restult.out
 
 cat /tmp/restult.out
 
