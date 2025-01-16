@@ -114,3 +114,9 @@ helm install flannel --set podCidr="192.168.0.0/16" --namespace kube-flannel fla
 # sleep 5
 # kubectl --kubeconfig /root/.kube/config apply -f /root/calico.yaml
 # systemctl restart kubelet
+sleep 120
+
+kubectl create ns monitoring
+kubectl create secret generic client-secret-grafana --from-literal=client_secret="8bc0a2ad6426be99490123254f0874740d948f96" --dry-run=client -oyaml > client-secret-grafana.yaml
+kubectl apply -f client-secret-grafana.yaml
+
