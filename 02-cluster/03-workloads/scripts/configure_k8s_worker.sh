@@ -59,24 +59,8 @@ sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 sudo systemctl enable --now kubelet
 
-#next line is getting EC2 instance IP, for kubeadm to initiate cluster
-#we need to get EC2 internal IP address- default ENI is eth0
 export ipaddr=`ip address|grep eth0|grep inet|awk -F ' ' '{print $2}' |awk -F '/' '{print $1}'`
 
-
-# # the kubeadm init won't work entel remove the containerd config and restart it.
-# rm /etc/containerd/config.toml
-# systemctl restart containerd
-
-# tee /etc/sysctl.d/kubernetes.conf<<EOF
-# net.bridge.bridge-nf-call-ip6tables = 1
-# net.bridge.bridge-nf-call-iptables = 1
-# net.ipv4.ip_forward = 1
-# EOF
-
-# sysctl --system
-
-# to insure the join command start when the installion of master node is done.
 sleep 60
 
 aws s3 cp s3://${s3_bucket_name}/join_command.sh /tmp/.
