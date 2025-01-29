@@ -59,8 +59,6 @@ sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 sudo systemctl enable --now kubelet 
 
-#next line is getting EC2 instance IP, for kubeadm to initiate cluster
-#we need to get EC2 internal IP address- default ENI is eth0
 export ipaddr=`ip address|grep enX0|grep inet|awk -F ' ' '{print $2}' |awk -F '/' '{print $1}'`
 export pubip=`dig +short myip.opendns.com @resolver1.opendns.com`
 
@@ -73,7 +71,7 @@ cat /tmp/restult.out
 tail -2 /tmp/restult.out > /tmp/join_command.sh;
 aws s3 cp /tmp/join_command.sh s3://${s3_bucket_name};
 
-#this adds .kube/config for root account, run same for ubuntu user, if you need it
+#Add kube config to root user.
 mkdir -p /root/.kube;
 cp -i /etc/kubernetes/admin.conf /root/.kube/config;
 cp -i /etc/kubernetes/admin.conf /tmp/admin.conf;
@@ -96,29 +94,11 @@ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scrip
 chmod 700 get_helm.sh
 bash get_helm.sh
 
-# Setup flannel as CNI
-# curl -O https://raw.githubusercontent.com/flannel-io/flannel/v0.22.0/Documentation/kube-flannel.yml
-
-# sed -i "s|\"Network\": \"10.244.0.0/16\"|\"Network\": \"192.168.0.0/16\"|" "kube-flannel.yml"
-
-# kubectl apply -f kube-flannel.yml
-
 # Setup flannel
 kubectl create --kubeconfig /root/.kube/config ns kube-flannel
 kubectl label --overwrite ns kube-flannel pod-security.kubernetes.io/enforce=privileged
 helm repo add flannel https://flannel-io.github.io/flannel/
 helm install flannel --set podCidr="192.168.0.0/16" --namespace kube-flannel flannel/flannel
-
-#Uncomment next line if you want calico Cluster Pod Network
-# curl -o /root/calico.yaml https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/tigera-operator.yaml
-# sleep 5
-# kubectl --kubeconfig /root/.kube/config apply -f /root/calico.yaml
-# systemctl restart kubelet
-# sleep 120
-
-kubectl create ns monitoring
-kubectl create secret generic client-secret-grafana -n monitoring --from-literal=client_secret="8bc0a2ad6426be99490123254f0874740d948f96" --dry-run=client -oyaml > client-secret-grafana.yaml
-kubectl apply -f client-secret-grafana.yaml
 
 # Configure dynamic storageclass 
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.30/deploy/local-path-storage.yaml

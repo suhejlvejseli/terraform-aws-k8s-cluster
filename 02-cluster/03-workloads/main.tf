@@ -191,3 +191,4 @@ resource "aws_instance" "worker" {
     Name = "k8s-worker-node-${count.index + 1}"
   }, local.default_tags)
 }
+
